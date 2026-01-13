@@ -1,0 +1,42 @@
+# FastAPI 및 웹 프레임워크
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+python-multipart==0.0.9
+
+# Redis 비동기 클라이언트
+redis[hiredis]==5.2.1
+
+# Supabase 클라이언트
+supabase==2.10.0
+
+# Pydantic 데이터 유효성 검증
+pydantic==2.10.3
+pydantic-settings==2.6.0
+
+# 환경 변수 관리
+python-dotenv==1.0.1
+
+# OpenAI 및 LangChain
+openai==1.58.1
+langchain==0.3.10
+langchain-openai==0.2.14
+
+# 비동기 작업 스케줄링
+celery==5.4.0
+
+# 테스트 프레임워크
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+httpx==0.27.2
+
+# 코드 품질 도구
+black==24.10.0
+ruff==0.8.4
+mypy==1.13.0
+
+# 로깅
+loguru==0.7.3
+
+# 타입 힌트
+typing-extensions==4.12.2

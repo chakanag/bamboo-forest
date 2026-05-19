@@ -13,6 +13,8 @@ class PostDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final postAsync = ref.watch(postDetailProvider(postId));
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(title: const Text('이야기 상세')),
@@ -20,32 +22,60 @@ class PostDetailScreen extends ConsumerWidget {
         data: (post) {
           final isBlinded = post.status != 'active' || post.reports >= 50;
 
+          // 태그 칩 색상
+          final tagBg = isDark
+              ? scheme.onSurface.withOpacity(0.10)
+              : AppTheme.purpleLight;
+          final tagTextColor = scheme.primary;
+
+          // 본문 컨테이너 색상
+          final contentBg = isDark ? scheme.surface : Colors.white;
+          final shadowColor = isDark
+              ? Colors.black.withOpacity(0.3)
+              : Colors.black.withOpacity(0.05);
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tags
+                // 태그
                 Wrap(
                   spacing: 8,
-                  children: post.tags.map((tag) => Chip(
-                    label: Text('#$tag'),
-                    backgroundColor: AppTheme.bambooLight,
-                    labelStyle: const TextStyle(color: AppTheme.bambooDeep),
-                  )).toList(),
+                  runSpacing: 6,
+                  children: post.tags
+                      .map(
+                        (tag) => Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: tagBg,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '#$tag',
+                            style: TextStyle(
+                              color: tagTextColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
                 const SizedBox(height: 20),
 
-                // Content
+                // 본문
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: contentBg,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: shadowColor,
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -56,15 +86,18 @@ class PostDetailScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 18,
                       height: 1.6,
-                      color: isBlinded ? AppTheme.textSub : AppTheme.textMain,
-                      fontStyle: isBlinded ? FontStyle.italic : FontStyle.normal,
+                      color: isBlinded
+                          ? scheme.onSurface.withOpacity(0.4)
+                          : scheme.onSurface,
+                      fontStyle:
+                          isBlinded ? FontStyle.italic : FontStyle.normal,
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 30),
 
-                // Timer
+                // 타이머
                 if (!isBlinded)
                   TtlTimer(
                     createdAt: post.createdAt,
@@ -73,19 +106,23 @@ class PostDetailScreen extends ConsumerWidget {
 
                 const SizedBox(height: 40),
 
-                // Actions
+                // 공감 / 신고 버튼
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _ActionButton(
                       icon: Icons.favorite_rounded,
                       label: '${post.recommendations} 공감',
-                      color: AppTheme.bambooMedium,
+                      color: scheme.primary,
                       onTap: () async {
-                        final success = await ref.read(apiServiceProvider).recommendPost(postId);
+                        final success = await ref
+                            .read(apiServiceProvider)
+                            .recommendPost(postId);
                         if (success && context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('공감했습니다! 시간이 연장됩니다.')),
+                            const SnackBar(
+                              content: Text('공감했습니다! 시간이 연장됩니다.'),
+                            ),
                           );
                           ref.invalidate(postDetailProvider(postId));
                           ref.invalidate(postsProvider);
@@ -95,7 +132,7 @@ class PostDetailScreen extends ConsumerWidget {
                     _ActionButton(
                       icon: Icons.report_problem_rounded,
                       label: '신고',
-                      color: AppTheme.alertRed,
+                      color: scheme.error,
                       onTap: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
@@ -103,20 +140,32 @@ class PostDetailScreen extends ConsumerWidget {
                             title: const Text('신고하시겠습니까?'),
                             content: const Text('부적절한 내용인가요?'),
                             actions: [
-                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
                               TextButton(
-                                onPressed: () => Navigator.pop(context, true), 
-                                child: const Text('신고', style: TextStyle(color: Colors.red)),
+                                onPressed: () =>
+                                    Navigator.pop(context, false),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, true),
+                                child: Text(
+                                  '신고',
+                                  style: TextStyle(color: scheme.error),
+                                ),
                               ),
                             ],
                           ),
                         );
 
                         if (confirm == true) {
-                          final success = await ref.read(apiServiceProvider).reportPost(postId);
+                          final success = await ref
+                              .read(apiServiceProvider)
+                              .reportPost(postId);
                           if (success && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('신고가 접수되었습니다.')),
+                              const SnackBar(
+                                content: Text('신고가 접수되었습니다.'),
+                              ),
                             );
                             ref.invalidate(postDetailProvider(postId));
                           }
@@ -129,13 +178,23 @@ class PostDetailScreen extends ConsumerWidget {
             ).animate().fadeIn(duration: 500.ms),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('오류: $err')),
+        loading: () => Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        error: (err, stack) => Center(
+          child: Text(
+            '오류: $err',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
       ),
     );
   }
 }
 
+// ── 액션 버튼 ──────────────────────────────────────────────────────────────────
 class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -157,9 +216,9 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withOpacity(0.10),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withOpacity(0.30)),
         ),
         child: Column(
           children: [

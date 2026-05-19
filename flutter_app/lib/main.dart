@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'screens/timeline_screen.dart';
+import 'screens/galaxy_timeline_screen.dart';
 import 'theme/app_theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -24,7 +24,9 @@ class BambooForestApp extends StatelessWidget {
       title: 'Anonymous Bamboo Forest',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const TimelineScreen(),
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      home: const GalaxyTimelineScreen(),
     );
   }
 }

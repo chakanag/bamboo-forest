@@ -68,10 +68,14 @@ app = FastAPI(
 )
 
 # CORS 미들웨어 설정
+# 개발(debug) 환경: 모든 오리진 허용 (Flutter 크롬 앱 포트가 매번 다를 수 있음)
+# 프로덕션: .env의 ALLOWED_ORIGINS만 허용
+_cors_origins = ["*"] if settings.debug else settings.allowed_origins_list
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    # wildcard("*")와 allow_credentials=True는 함께 쓸 수 없음
+    allow_credentials=("*" not in _cors_origins),
     allow_methods=["*"],
     allow_headers=["*"],
 )

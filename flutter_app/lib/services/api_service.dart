@@ -18,10 +18,13 @@ class ApiService {
 
   Future<List<Post>> getPosts() async {
     final response = await http.get(Uri.parse('$baseUrl/api/v1/posts/'));
-    
+
     if (response.statusCode == 200) {
-      final List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      return body.map((dynamic item) => Post.fromJson(item)).toList();
+      // 서버 응답: { "posts": [...], "total": N, "page": N, "per_page": N }
+      final Map<String, dynamic> body =
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      final List<dynamic> posts = body['posts'] as List<dynamic>;
+      return posts.map((item) => Post.fromJson(item as Map<String, dynamic>)).toList();
     } else {
       throw Exception('Failed to load posts: ${response.statusCode}');
     }
@@ -34,8 +37,10 @@ class ApiService {
       body: jsonEncode({'content': content}),
     );
 
-    if (response.statusCode == 200) {
-      return Post.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    // 서버가 201 Created 반환
+    if (response.statusCode == 201) {
+      return Post.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>);
     } else {
       throw Exception('Failed to create post: ${response.body}');
     }
@@ -45,9 +50,10 @@ class ApiService {
     final response = await http.get(Uri.parse('$baseUrl/api/v1/posts/$id'));
 
     if (response.statusCode == 200) {
-      return Post.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Post.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>);
     } else {
-      throw Exception('Failed to load post');
+      throw Exception('Failed to load post: ${response.statusCode}');
     }
   }
 
@@ -63,11 +69,16 @@ class ApiService {
 
   Future<List<Post>> getRanking(String type) async {
     // type: 'views' or 'recs'
-    final response = await http.get(Uri.parse('$baseUrl/api/v1/posts/ranking/$type'));
+    // 서버 응답: List<PostResponse> (직접 배열)
+    final response =
+        await http.get(Uri.parse('$baseUrl/api/v1/posts/ranking/$type'));
 
     if (response.statusCode == 200) {
-      final List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      return body.map((dynamic item) => Post.fromJson(item)).toList();
+      final List<dynamic> body =
+          jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+      return body
+          .map((item) => Post.fromJson(item as Map<String, dynamic>))
+          .toList();
     } else {
       throw Exception('Failed to load ranking');
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/posts_provider.dart';
-import '../theme/app_theme.dart';
 
 class CreatePostScreen extends ConsumerStatefulWidget {
   const CreatePostScreen({super.key});
@@ -31,16 +30,19 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('게시글이 숲에 심어졌습니다.'),
-            backgroundColor: AppTheme.bambooDeep,
+          SnackBar(
+            content: const Text('게시글이 숲에 심어졌습니다.'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('오류 발생: $e'), backgroundColor: AppTheme.alertRed),
+          SnackBar(
+            content: Text('오류 발생: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
         );
         setState(() => _isSubmitting = false);
       }
@@ -49,6 +51,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // 글쓰기 배경 — 다크모드는 카드 색, 라이트모드는 흰색
+    final fieldBg = isDark ? scheme.surface : Colors.white;
+
     return Scaffold(
       appBar: AppBar(title: const Text('새 글 쓰기')),
       body: Padding(
@@ -62,15 +70,16 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 maxLines: null,
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
-                decoration: const InputDecoration(
+                style: Theme.of(context).textTheme.bodyLarge,
+                decoration: InputDecoration(
                   hintText: '임금님 귀는 당나귀 귀...\n하고 싶은 말을 적어보세요.',
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: fieldBg,
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
+                  counterStyle: Theme.of(context).textTheme.bodySmall,
                 ),
-                style: const TextStyle(fontSize: 16, height: 1.5),
               ),
             ),
             const SizedBox(height: 16),
@@ -82,20 +91,22 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 builder: (context, value, child) {
                   final text = value.text.trim();
                   final isValid = text.isNotEmpty && text.length <= 200;
-                  
+
                   return ElevatedButton(
                     onPressed: isValid && !_isSubmitting ? _submit : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.bambooDeep,
-                      disabledBackgroundColor: Colors.grey[300],
-                    ),
                     child: _isSubmitting
-                        ? const SizedBox(
-                            width: 24, 
-                            height: 24, 
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: scheme.onPrimary,
+                              strokeWidth: 2,
+                            ),
                           )
-                        : const Text('숲에 외치기', style: TextStyle(fontSize: 16)),
+                        : const Text(
+                            '숲에 외치기',
+                            style: TextStyle(fontSize: 16),
+                          ),
                   );
                 },
               ),

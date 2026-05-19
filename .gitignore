@@ -1,0 +1,37 @@
+# ── 환경 변수 (절대 커밋 금지) ─────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Python 가상환경 ──────────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+htmlcov/
+.coverage
+
+# ── Flutter / Dart ──────────────────────────────────────────────────────────
+flutter_app/.dart_tool/
+flutter_app/.flutter-plugins
+flutter_app/.flutter-plugins-dependencies
+flutter_app/build/
+flutter_app/.packages
+flutter_app/pubspec.lock   # lock은 앱이면 커밋, 라이브러리면 제외 (앱이므로 유지해도 됨)
+
+# ── macOS ────────────────────────────────────────────────────────────────────
+.DS_Store
+*.swp
+
+# ── IDE ──────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml

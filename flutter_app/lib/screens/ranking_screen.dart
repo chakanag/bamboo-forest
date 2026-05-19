@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/posts_provider.dart';
 import '../models/post.dart';
-import '../theme/app_theme.dart';
 import 'post_detail_screen.dart';
 
 class RankingScreen extends StatelessWidget {
@@ -15,10 +14,9 @@ class RankingScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('명예의 전당'),
-          bottom: const TabBar(
-            indicatorColor: AppTheme.bambooDeep,
-            labelColor: AppTheme.bambooDeep,
-            tabs: [
+          bottom: TabBar(
+            // TabBar 색상은 darkTheme의 tabBarTheme에서 자동 적용
+            tabs: const [
               Tab(text: '최다 조회'),
               Tab(text: '최다 공감'),
             ],
@@ -47,7 +45,12 @@ class _RankingList extends ConsumerWidget {
     return rankingAsync.when(
       data: (posts) {
         if (posts.isEmpty) {
-          return const Center(child: Text('랭킹 데이터가 없습니다.'));
+          return Center(
+            child: Text(
+              '랭킹 데이터가 없습니다.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          );
         }
         return ListView.builder(
           itemCount: posts.length,
@@ -55,21 +58,32 @@ class _RankingList extends ConsumerWidget {
           itemBuilder: (context, index) {
             final post = posts[index];
             return _RankingItem(
-              post: post, 
-              rank: index + 1, 
+              post: post,
+              rank: index + 1,
               type: type,
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => PostDetailScreen(postId: post.id)),
+                  MaterialPageRoute(
+                    builder: (_) => PostDetailScreen(postId: post.id),
+                  ),
                 );
               },
             );
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('오류: $err')),
+      loading: () => Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+      error: (err, stack) => Center(
+        child: Text(
+          '오류: $err',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ),
     );
   }
 }
@@ -89,10 +103,25 @@ class _RankingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // 메달 색상 — 다크모드도 동일하게 유지 (메달은 원래 색이어야 함)
     Color? medalColor;
-    if (rank == 1) medalColor = const Color(0xFFFFD700); // Gold
-    else if (rank == 2) medalColor = const Color(0xFFC0C0C0); // Silver
-    else if (rank == 3) medalColor = const Color(0xFFCD7F32); // Bronze
+    if (rank == 1) medalColor = const Color(0xFFFFD700);
+    else if (rank == 2) medalColor = const Color(0xFFC0C0C0);
+    else if (rank == 3) medalColor = const Color(0xFFCD7F32);
+
+    // 숫자 배지 배경 — 메달 없는 경우 다크모드 대응
+    final rankBg = medalColor?.withOpacity(0.15) ??
+        (isDark
+            ? scheme.onSurface.withOpacity(0.08)
+            : Colors.grey[100]);
+
+    // 통계 배지 색상
+    final badgeBg = isDark
+        ? scheme.primary.withOpacity(0.15)
+        : scheme.primary.withOpacity(0.12);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -103,15 +132,17 @@ class _RankingItem extends StatelessWidget {
           height: 40,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: medalColor?.withOpacity(0.2) ?? Colors.grey[100],
+            color: rankBg,
             shape: BoxShape.circle,
-            border: medalColor != null ? Border.all(color: medalColor, width: 2) : null,
+            border: medalColor != null
+                ? Border.all(color: medalColor, width: 2)
+                : null,
           ),
           child: Text(
             rank.toString(),
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: medalColor ?? Colors.grey,
+              color: medalColor ?? scheme.onSurface.withOpacity(0.4),
               fontSize: 18,
             ),
           ),
@@ -120,18 +151,23 @@ class _RankingItem extends StatelessWidget {
           post.content,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.w500),
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(fontWeight: FontWeight.w500),
         ),
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: AppTheme.bambooLight,
+            color: badgeBg,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            type == 'views' ? '${post.views}회' : '${post.recommendations}개',
-            style: const TextStyle(
-              color: AppTheme.bambooDeep,
+            type == 'views'
+                ? '${post.views}회'
+                : '${post.recommendations}개',
+            style: TextStyle(
+              color: scheme.primary,
               fontWeight: FontWeight.bold,
               fontSize: 12,
             ),

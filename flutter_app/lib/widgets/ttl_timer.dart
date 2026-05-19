@@ -35,22 +35,12 @@ class _TtlTimerState extends State<TtlTimer> {
     final now = DateTime.now();
     final expireTime = widget.createdAt.add(Duration(seconds: widget.ttlSeconds));
     final diff = expireTime.difference(now).inSeconds;
-    
-    // Total duration should probably be based on the initial ttl, 
-    // but extensions complicate this. We'll just clamp.
-    // However, to show a progress bar, we need a "total" reference.
-    // If TTL can increase, the bar might jump back. That's acceptable for this game mechanic.
-    // We will assume 'total' is the current TTL seconds + age? No, that's complex.
-    // Let's just use the provided ttlSeconds as the "max" context for now, 
-    // or maybe hardcode a "standard" 10 min window for visualization if not extended?
-    // Better: Just show remaining time text and a bar that represents % of 10 mins (600s)?
-    // Or just % of the current total TTL.
-    
+
     if (mounted) {
       setState(() {
         _remainingSeconds = diff > 0 ? diff : 0;
-        // Visual hack: Assume max is 10 mins (600s) or the current TTL if larger
-        int max = widget.ttlSeconds > 600 ? widget.ttlSeconds : 600;
+        // 현재 TTL이 기본(600s)보다 크면 그걸 max로, 아니면 600s 기준
+        final max = widget.ttlSeconds > 600 ? widget.ttlSeconds : 600;
         _percent = (_remainingSeconds / max).clamp(0.0, 1.0);
       });
     }
@@ -62,10 +52,11 @@ class _TtlTimerState extends State<TtlTimer> {
     super.dispose();
   }
 
-  Color _getColor() {
-    if (_percent > 0.5) return AppTheme.bambooDeep;
-    if (_percent > 0.2) return Colors.orange;
-    return AppTheme.alertRed;
+  /// 건강 상태에 따라 색상 반환 — context로 테마 감지
+  Color _getColor(BuildContext context) {
+    if (_percent > 0.5) return Theme.of(context).colorScheme.primary;
+    if (_percent > 0.2) return AppTheme.healthOrange;
+    return AppTheme.healthRed;
   }
 
   String _formatTime(int seconds) {
@@ -76,6 +67,13 @@ class _TtlTimerState extends State<TtlTimer> {
 
   @override
   Widget build(BuildContext context) {
+    final color = _getColor(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelColor = Theme.of(context).textTheme.bodySmall?.color;
+    final barBg = isDark
+        ? AppTheme.darkBorder
+        : AppTheme.purpleLight;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -84,12 +82,14 @@ class _TtlTimerState extends State<TtlTimer> {
           children: [
             Text(
               '남은 시간',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: labelColor,
+              ),
             ),
             Text(
               _formatTime(_remainingSeconds),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: _getColor(),
+                color: color,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -99,8 +99,8 @@ class _TtlTimerState extends State<TtlTimer> {
         LinearPercentIndicator(
           lineHeight: 6.0,
           percent: _percent,
-          backgroundColor: AppTheme.bambooLight,
-          progressColor: _getColor(),
+          backgroundColor: barBg,
+          progressColor: color,
           barRadius: const Radius.circular(3),
           padding: EdgeInsets.zero,
           animation: true,

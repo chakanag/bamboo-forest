@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/posts_provider.dart';
 import '../widgets/post_card.dart';
-import '../theme/app_theme.dart';
+
 import 'create_post_screen.dart';
 import 'post_detail_screen.dart';
 import 'ranking_screen.dart';
@@ -31,7 +31,7 @@ class TimelineScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(postsProvider.notifier).refresh(),
-        color: AppTheme.bambooDeep,
+        color: Theme.of(context).colorScheme.primary,
         child: postsAsync.when(
           data: (posts) {
             if (posts.isEmpty) {
@@ -39,11 +39,16 @@ class TimelineScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.forest_outlined, size: 64, color: AppTheme.bambooMedium.withOpacity(0.5)),
+                    Icon(
+                      Icons.forest_outlined,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                    ),
                     const SizedBox(height: 16),
-                    const Text('아직 심어진 대나무가 없습니다.\n첫 번째 이야기를 들려주세요.', 
+                    Text(
+                      '아직 심어진 대나무가 없습니다.\n첫 번째 이야기를 들려주세요.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppTheme.textSub),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
                 ),
@@ -68,16 +73,25 @@ class TimelineScreen extends ConsumerWidget {
               },
             );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppTheme.bambooDeep),
+          loading: () => Center(
+            child: CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           error: (err, stack) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: AppTheme.alertRed),
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 const SizedBox(height: 16),
-                Text('오류가 발생했습니다: $err'),
+                Text(
+                  '오류가 발생했습니다: $err',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => ref.read(postsProvider.notifier).refresh(),

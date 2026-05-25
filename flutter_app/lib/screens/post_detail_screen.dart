@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/posts_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ttl_timer.dart';
@@ -175,7 +174,7 @@ class PostDetailScreen extends ConsumerWidget {
                   ],
                 ),
               ],
-            ).animate().fadeIn(duration: 500.ms),
+            ),
           );
         },
         loading: () => Center(
@@ -234,6 +233,6 @@ class _ActionButton extends StatelessWidget {
           ],
         ),
       ),
-    ).animate().scale(duration: 200.ms, curve: Curves.easeOut);
+    );
   }
 }

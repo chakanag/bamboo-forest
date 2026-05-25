@@ -16,7 +16,7 @@ class TimelineScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('익명 대나무숲'),
+        title: const Text('Yeongi'),
         actions: [
           IconButton(
             icon: const Icon(Icons.leaderboard_outlined),
@@ -40,13 +40,13 @@ class TimelineScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.forest_outlined,
+                      Icons.blur_circular_outlined,
                       size: 64,
                       color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '아직 심어진 대나무가 없습니다.\n첫 번째 이야기를 들려주세요.',
+                      '아직 아무 이야기도 없어요.\n첫 번째 이야기를 들려주세요.',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),

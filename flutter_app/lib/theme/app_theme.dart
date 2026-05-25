@@ -20,9 +20,12 @@ class AppTheme {
   static const Color darkTextMain  = Color(0xFFFAF5FF); // 흰 보라빛
   static const Color darkTextSub   = Color(0xFFA78BFA); // 연보라 서브
 
-  // ── Health State Colors ────────────────────────────────────────────────────
-  static const Color healthOrange  = Color(0xFFF97316); // 시들기 시작
-  static const Color healthRed     = Color(0xFFEF4444); // 임종 직전
+  // ── Health State Colors — 경보색 대신 자연스러운 소멸 톤 ─────────────────────
+  static const Color healthFading   = Color(0xFFD97706); // 앰버 — 촛불 꺼지듯
+  static const Color healthCritical = Color(0xFFBE185D); // 로즈 — 노을처럼 스러짐
+  // 하위 호환 alias
+  static const Color healthOrange  = healthFading;
+  static const Color healthRed     = healthCritical;
 
   // ── Light Theme ────────────────────────────────────────────────────────────
   static ThemeData get lightTheme {
@@ -67,7 +70,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: purpleLight, width: 1),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: purpleDeep,

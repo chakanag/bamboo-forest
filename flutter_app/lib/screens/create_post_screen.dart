@@ -31,7 +31,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('게시글이 숲에 심어졌습니다.'),
+            content: const Text('이야기가 공유되었습니다. 곧 사라집니다.'),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
@@ -58,9 +58,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     final fieldBg = isDark ? scheme.surface : Colors.white;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('새 글 쓰기')),
+      appBar: AppBar(title: const Text('마음 꺼내기')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             Expanded(
@@ -72,7 +72,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 textAlignVertical: TextAlignVertical.top,
                 style: Theme.of(context).textTheme.bodyLarge,
                 decoration: InputDecoration(
-                  hintText: '임금님 귀는 당나귀 귀...\n하고 싶은 말을 적어보세요.',
+                  hintText: '지금 이 순간의 마음을 적어보세요.\n잠깐이었어도, 진심이니까.',
                   filled: true,
                   fillColor: fieldBg,
                   border: InputBorder.none,
@@ -104,7 +104,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             ),
                           )
                         : const Text(
-                            '숲에 외치기',
+                            '이야기 공유하기',
                             style: TextStyle(fontSize: 16),
                           ),
                   );

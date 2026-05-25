@@ -81,7 +81,7 @@ class _TtlTimerState extends State<TtlTimer> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '남은 시간',
+              '사라지기까지',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: labelColor,
               ),

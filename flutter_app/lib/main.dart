@@ -10,18 +10,18 @@ void main() async {
   
   runApp(
     const ProviderScope(
-      child: BambooForestApp(),
+      child: YeongiApp(),
     ),
   );
 }
 
-class BambooForestApp extends StatelessWidget {
-  const BambooForestApp({super.key});
+class YeongiApp extends StatelessWidget {
+  const YeongiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Anonymous Bamboo Forest',
+      title: 'Yeongi',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

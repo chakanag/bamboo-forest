@@ -21,10 +21,15 @@ class _TtlTimerState extends State<TtlTimer> {
   late Timer _timer;
   late int _remainingSeconds;
   late double _percent;
+  // API에서 받은 ttl_seconds는 '현재 남은 시간'이므로
+  // 위젯 초기화 시점 기준으로 만료 시각을 고정한다.
+  late final DateTime _expireTime;
+  static const int _defaultTtl = 600; // 기준 총 TTL (초)
 
   @override
   void initState() {
     super.initState();
+    _expireTime = DateTime.now().add(Duration(seconds: widget.ttlSeconds));
     _calculateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _calculateTime();
@@ -33,15 +38,14 @@ class _TtlTimerState extends State<TtlTimer> {
 
   void _calculateTime() {
     final now = DateTime.now();
-    final expireTime = widget.createdAt.add(Duration(seconds: widget.ttlSeconds));
-    final diff = expireTime.difference(now).inSeconds;
+    final diff = _expireTime.difference(now).inSeconds;
+    // 총 기준: ttlSeconds가 기본보다 길면(추천으로 연장된 경우) 그걸 기준으로
+    final total = widget.ttlSeconds > _defaultTtl ? widget.ttlSeconds : _defaultTtl;
 
     if (mounted) {
       setState(() {
         _remainingSeconds = diff > 0 ? diff : 0;
-        // 현재 TTL이 기본(600s)보다 크면 그걸 max로, 아니면 600s 기준
-        final max = widget.ttlSeconds > 600 ? widget.ttlSeconds : 600;
-        _percent = (_remainingSeconds / max).clamp(0.0, 1.0);
+        _percent = (_remainingSeconds / total).clamp(0.0, 1.0);
       });
     }
   }

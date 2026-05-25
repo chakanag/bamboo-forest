@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/posts_provider.dart';
 import '../theme/app_theme.dart';
-import '../widgets/ttl_timer.dart';
 
 class PostDetailScreen extends ConsumerWidget {
   final String postId;
@@ -96,14 +95,31 @@ class PostDetailScreen extends ConsumerWidget {
 
                 const SizedBox(height: 30),
 
-                // 타이머
+                // 소멸 안내
                 if (!isBlinded)
-                  TtlTimer(
-                    createdAt: post.createdAt,
-                    ttlSeconds: post.ttlSeconds,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.blur_on_outlined,
+                          size: 13,
+                          color: scheme.onSurface.withOpacity(0.30),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          '이 마음은 곧 사라져요',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurface.withOpacity(0.30),
+                                fontSize: 11,
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
                 // 공감 / 신고 버튼
                 Row(

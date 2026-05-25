@@ -74,7 +74,7 @@ class RedisService:
             "posts:expiring",
             {post_id: now_ts + settings.post_default_ttl},
         )
-        pipe.execute()
+        await pipe.execute()
 
         # 랭킹 인덱스 초기화
         await self.redis.zadd("posts:rank:views", {post_id: 0})
@@ -321,7 +321,7 @@ class RedisService:
             pipe.zrem("posts:expiring", post_id)
             pipe.zrem("posts:rank:views", post_id)
             pipe.zrem("posts:rank:recs", post_id)
-        pipe.execute()
+        await pipe.execute()
 
         logger.info(f"만료된 인덱스 정리됨: {len(expired_ids)}개")
 
